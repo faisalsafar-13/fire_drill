@@ -4,27 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Fire Drill Record</title>
-<meta name="theme-color" content="#1f6fc9">
+<meta name="theme-color" content="#b3261e">
 <style>
 /* Layout: single phone-first column; numbered steps; drill stopwatch; sticky Create PDF bar. Same design as the Weekend Maktab Risk Assessment. */
 :root{
-  --brand:#1f6fc9; --brand-ink:#ffffff; --brand-soft:#e8f1fc; --brand-text:#1a5fae;
+  --brand:#b3261e; --brand-ink:#ffffff; --brand-soft:#fcebea; --brand-text:#a1231c;
   --bg:#f3f5f7; --card:#ffffff; --ink:#18212b; --muted:#5a6673; --line:#d6dde5;
   --low:#2e7d4f; --low-bg:#e3f3e8; --med:#8f5d00; --med-bg:#fff0cf; --high:#b3261e; --high-bg:#fde4e1;
   --r:14px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --brand:#5aa2f2; --brand-ink:#08203d; --brand-soft:#15283f; --brand-text:#8cc0ff;
+  --brand:#ff8a80; --brand-ink:#3b0906; --brand-soft:#3a1816; --brand-text:#ffb4ab;
   --bg:#10151b; --card:#19212a; --ink:#e7edf3; --muted:#9dabb9; --line:#2d3946;
   --low:#7fd3a0; --low-bg:#173324; --med:#f1c46b; --med-bg:#3a2c0f; --high:#ff8f86; --high-bg:#3f1714; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --brand:#5aa2f2; --brand-ink:#08203d; --brand-soft:#15283f; --brand-text:#8cc0ff;
+  --brand:#ff8a80; --brand-ink:#3b0906; --brand-soft:#3a1816; --brand-text:#ffb4ab;
   --bg:#10151b; --card:#19212a; --ink:#e7edf3; --muted:#9dabb9; --line:#2d3946;
   --low:#7fd3a0; --low-bg:#173324; --med:#f1c46b; --med-bg:#3a2c0f; --high:#ff8f86; --high-bg:#3f1714; color-scheme:dark}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding-bottom:100px}
-header{background:#1f6fc9;color:#fff;padding:20px 16px 18px;padding-top:max(20px,env(safe-area-inset-top))}
+header{background:#b3261e;color:#fff;padding:20px 16px 18px;padding-top:max(20px,env(safe-area-inset-top))}
 header .in{max-width:760px;margin:0 auto;display:flex;flex-direction:column-reverse;gap:12px}
 header .txt{min-width:0}
 header .logo{display:block;height:24px;width:auto;max-width:100%;align-self:flex-end}
@@ -39,7 +39,7 @@ main{max-width:760px;margin:0 auto;padding:8px 16px}
 .i{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-left:6px;border-radius:50%;border:1.5px solid var(--brand);color:var(--brand-text);font:italic 700 13px/1 Georgia,serif;vertical-align:middle;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
 .i[aria-expanded="true"]{background:var(--brand);color:var(--brand-ink)}
 .i:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-.infoBox{background:var(--brand-soft);color:var(--ink);border-radius:10px;padding:10px 12px;margin:6px 0 0;font-size:.88rem;font-weight:400;line-height:1.45}
+.infoBox{background:var(--bg);border-left:3px solid var(--brand);color:var(--ink);border-radius:10px;padding:10px 12px;margin:6px 0 0;font-size:.88rem;font-weight:400;line-height:1.45}
 .infoBox b{font-weight:600}
 label.f{display:block;font-weight:600;font-size:.92rem;margin:12px 0 0;min-width:0}
 .req{color:var(--high)}
@@ -366,6 +366,7 @@ var BRANCHES={
 /* Explanations shown when staff tap the (i) next to a question */
 var INFO={
  branch:'Choose your branch. The venue, venue type and assembly points fill in from the Fire Safety Policy. Check them and correct anything that has changed.',
+ venueType:'Mosque or school. It fills in from your branch; change it if the drill is at a different venue.',
  drillType:'The policy says staff and pupils should be told a drill is happening. A real or false alarm can be logged here too, because the same lessons apply.',
  period:'When the alarm went off. Drills at break or between lessons test whether pupils know to line up by the class they were last in.',
  alarmMethod:'How people knew to leave. If the venue alarm is linked to the fire service, the venue must know about the drill in advance.',
@@ -380,6 +381,8 @@ var INFO={
  tReg:'When every teacher had raised their hand to show their register and headcount were complete.',
  tClear:'When the fire marshal or venue said it was safe to go back in.',
  pupilsOn:'The number of pupils marked present on today\'s registers when the alarm sounded.',
+ staffOn:'Everyone working at the branch today: teachers, admin and volunteers.',
+ visOn:'Anyone else on site who isn\'t staff or a pupil, such as parents, contractors or visitors who signed in.',
  missing:'Record any gap at the first count, even if the person was found quickly. Register mistakes are one of the most useful things a drill shows up.',
  behaviour:'The policy asks the fire warden to note any inappropriate behaviour, such as running, talking or going back for belongings.',
  difficulties:'Note anyone who struggled, for example a pupil with a disability, younger pupils on stairs, or someone who didn\'t hear the alarm.',
@@ -388,9 +391,43 @@ var INFO={
  jointDrill:'If other groups use the building while we\'re there, the policy asks for an extra drill when all of them are on site, to copy a real emergency.',
  outcome:'Repeat the drill soon if people couldn\'t be accounted for, the alarm wasn\'t heard, or exits were blocked.',
  briefed:'The names of staff and volunteers you talked to after the drill about what went well and what to change.',
+ approver:'The Academy Head reads the record and checks the actions are followed up. Leave this blank if you\'re the fire warden.',
+ sharedWith:'Send the venue a copy, especially if the drill showed a problem with their building, such as a locked exit or an alarm that couldn\'t be heard.',
  nextDrill:'The policy asks for at least one drill a year. Many branches do one each term, and a new branch or venue should do one in the first few weeks.',
  sig:'Your signature confirms you ran this drill and that the record is accurate to the best of your knowledge.'
 };
+var PREP_INFO=[
+ 'Tell staff the date and time, and go through the evacuation steps with them beforehand. They then know their part: stopping the class, the route out and taking the register.',
+ 'Pupils should know the way out from their room and where to line up. Remind them to walk, stay silent and leave their belongings.',
+ 'Many venue alarms call the fire service automatically. Tell the site or lettings manager first so they can stop that, or warn their alarm company.',
+ 'Other hirers, or the mosque, need to know so their people aren\'t alarmed and can join in if it\'s a joint drill.',
+ 'Fire marshals check that rooms are empty and help at the assembly point. Give each one the rooms, toilets and cupboards they sweep, and the assembly point they go to.',
+ 'Registers are taken at the assembly point from the copy each teacher emailed. If a class was split or covered, the person who took the register before the split takes it outside.',
+ '<b>PEEP stands for Personal Emergency Evacuation Plan.</b> It\'s a short written plan for anyone who can\'t get out quickly on their own, for example a wheelchair user, someone on crutches, or a pupil who may panic or not hear the alarm. It says which route they take and who helps them (their "buddy"). The fire warden and marshals need to know about every PEEP at the branch.',
+ 'Some mosques have no fire alarm that reaches every room. Agree how the alarm will be raised, and check it can be heard everywhere, including toilets and wudu areas.'
+];
+var OBS_INFO=[
+ ['Check the rooms furthest from the alarm, the toilets and the wudu areas. If anyone says they didn\'t hear it, note where they were.',
+  'Teachers should stop at once, not finish the activity first.',
+  'Walking briskly is safer than running, especially on stairs and in crowded corridors.',
+  'Silence lets staff give new instructions, for example if a route turns out to be blocked.',
+  'Going back for belongings slows everyone down. At mosques, pupils leave barefoot rather than look for their shoes.',
+  'Each room\'s nearest exit is on the fire action notice. Another route should only be used if that one is blocked.',
+  'Fire exits must not be locked, blocked by chairs, shoes or storage, or hard to open.',
+  'Closing doors and windows slows the spread of fire and smoke, but only if it doesn\'t delay leaving.',
+  'Lifts must never be used in a fire. Note it if anyone tried.'],
+ ['The sweep starts at the point furthest from the exit and includes toilets, stock rooms and cupboards. Marshals only do it if it\'s safe.',
+  'Check the person\'s PEEP (Personal Emergency Evacuation Plan) worked: the route, their helper, and any equipment such as an evacuation chair.',
+  'Pupils in the toilets, at wudu or out of class at break are the ones most often missed.'],
+ ['Pupils line up by the last class a register was taken for, for example their Qur\'an or memorisation class.',
+  'Teachers call the register from their emailed copy, then count the line to check the numbers match.',
+  'If a class was split because a teacher was absent, the staff member who took the register before the split lines the class up and checks it.',
+  'Raised hands show the fire marshal at a glance which registers are done.',
+  'Anyone missing must be reported to a marshal at once, so they can tell the fire service.',
+  'Check it was clear of traffic, the car park and the building, and that everyone fitted safely.'],
+ ['In a real fire only the fire service gives the all clear. At shared venues, the site or lettings manager decides.',
+  'One class at a time avoids crowding at doors and on stairs.']
+];
 var STAGES=[['tAlarm','Alarm sounded: start the clock'],['tOut','Last person out of the building'],['tReg','All registers and headcounts done'],['tClear','All clear given']];
 var OBSOPTS={vals:[['Yes','g'],['Partly','a'],['No','r'],['N/A','n']]};
 var PREPOPTS={vals:[['Done','g'],['Not yet','r'],['N/A','n']]};
@@ -407,16 +444,19 @@ function setStatus(m,err){ var s=$('status'); s.textContent=m; s.className='stat
 function F(n){ return form.elements[n]; }
 
 /* ---------- checklists ---------- */
-function chkHTML(list,store,prefix,opts){
-  return list.map(function(q,i){ var id=prefix+i, v=(store[id]||{}).v||'', note=(store[id]||{}).n||'';
-    return '<div class="chk'+cc(v)+'" data-id="'+id+'"><p>'+esc(q)+'</p><div class="seg">'+opts.vals.map(function(o){return '<label><input type="radio" name="c_'+id+'" value="'+o[0]+'"'+(v===o[0]?' checked':'')+'><span class="'+o[1]+'">'+o[0]+'</span></label>';}).join('')+'</div>'+
+function chkHTML(list,store,prefix,opts,infos){
+  return list.map(function(q,i){ var id=prefix+i, v=(store[id]||{}).v||'', note=(store[id]||{}).n||'', inf=(infos||[])[i];
+    return '<div class="chk'+cc(v)+'" data-id="'+id+'"><p>'+esc(q)+(inf?'<span class="i" role="button" tabindex="0" aria-label="What does this mean?" aria-expanded="false" aria-controls="info-'+id+'">i</span>':'')+'</p>'+(inf?'<div class="infoBox" id="info-'+id+'" hidden>'+inf+'</div>':'')+'<div class="seg">'+opts.vals.map(function(o){return '<label><input type="radio" name="c_'+id+'" value="'+o[0]+'"'+(v===o[0]?' checked':'')+'><span class="'+o[1]+'">'+o[0]+'</span></label>';}).join('')+'</div>'+
       '<textarea rows="1" data-note="'+id+'" placeholder="Note (optional)">'+esc(note)+'</textarea></div>'; }).join('');
 }
 function cc(v){ return (v==='No'||v==='Not yet')?' concern':v==='Partly'?' part':''; }
-function renderPrep(){ $('prepList').innerHTML=chkHTML(PREP,prep,'p',PREPOPTS); growAll($('prepList')); }
-function renderObs(){ var n=0; $('obsList').innerHTML=OBS.map(function(g,gi){ var h='<h3 class="grp">'+esc(g.t)+'</h3>'+chkHTML(g.q,obs,'o'+gi+'_',OBSOPTS); return h; }).join(''); growAll($('obsList')); }
+function renderPrep(){ $('prepList').innerHTML=chkHTML(PREP,prep,'p',PREPOPTS,PREP_INFO); growAll($('prepList')); }
+function renderObs(){ var n=0; $('obsList').innerHTML=OBS.map(function(g,gi){ var h='<h3 class="grp">'+esc(g.t)+'</h3>'+chkHTML(g.q,obs,'o'+gi+'_',OBSOPTS,OBS_INFO[gi]); return h; }).join(''); growAll($('obsList')); }
 function onChk(store){ return function(e){ var t=e.target, box=t.closest('.chk'); if(!box) return; var id=box.dataset.id; store[id]=store[id]||{};
   if(t.type==='radio'){ store[id].v=t.value; box.className='chk'+cc(t.value); } else if(t.dataset.note!=null){ store[id].n=t.value; } saveSoon(); }; }
+function chkInfo(e){ var ic=e.target.closest&&e.target.closest('.chk .i'); if(!ic) return; if(e.type==='keydown'&&e.key!=='Enter'&&e.key!==' ') return; e.preventDefault();
+  var box=document.getElementById(ic.getAttribute('aria-controls')); box.hidden=!box.hidden; ic.setAttribute('aria-expanded',String(!box.hidden)); }
+['prepList','obsList'].forEach(function(id){ $(id).addEventListener('click',chkInfo); $(id).addEventListener('keydown',chkInfo); });
 $('prepList').addEventListener('change',onChk(prep)); $('prepList').addEventListener('input',onChk(prep));
 $('obsList').addEventListener('change',onChk(obs)); $('obsList').addEventListener('input',onChk(obs));
 
@@ -531,7 +571,7 @@ function resetUI(){ var box=$('resetBox'); box.innerHTML='<button type="button" 
     $('resetNo').onclick=resetUI; $('resetYes').onclick=function(){ idbDel(STORE).then(function(){ location.reload(); }); }; }; }
 
 /* ---------- PDF ---------- */
-var BRAND=[31,111,201], BRAND_SOFT=[232,241,252], INKC=[24,33,43], MUTEDC=[90,102,115];
+var BRAND=[179,38,30], BRAND_SOFT=[248,240,239], INKC=[24,33,43], MUTEDC=[90,102,115];
 var FILL={g:[227,243,232],a:[255,236,196],r:[253,220,216]}, TXT={g:[30,110,64],a:[140,90,0],r:[170,30,25]};
 var ANSCOL={'Yes':'g','Done':'g','Partly':'a','No':'r','Not yet':'r'};
 function clean(s){ return String(s==null?'':s).replace(/[‘’ʼ]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/…/g,'...').replace(/×/g,'x').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g,''); }
