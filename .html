@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fire Drill Record</title>
+<meta name="theme-color" content="#1f6fc9">
+<style>
+/* Layout: single phone-first column; numbered steps; drill stopwatch; sticky Create PDF bar. Same design as the Weekend Maktab Risk Assessment. */
+:root{
+  --brand:#1f6fc9; --brand-ink:#ffffff; --brand-soft:#e8f1fc; --brand-text:#1a5fae;
+  --bg:#f3f5f7; --card:#ffffff; --ink:#18212b; --muted:#5a6673; --line:#d6dde5;
+  --low:#2e7d4f; --low-bg:#e3f3e8; --med:#8f5d00; --med-bg:#fff0cf; --high:#b3261e; --high-bg:#fde4e1;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --brand:#5aa2f2; --brand-ink:#08203d; --brand-soft:#15283f; --brand-text:#8cc0ff;
+  --bg:#10151b; --card:#19212a; --ink:#e7edf3; --muted:#9dabb9; --line:#2d3946;
+  --low:#7fd3a0; --low-bg:#173324; --med:#f1c46b; --med-bg:#3a2c0f; --high:#ff8f86; --high-bg:#3f1714; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --brand:#5aa2f2; --brand-ink:#08203d; --brand-soft:#15283f; --brand-text:#8cc0ff;
+  --bg:#10151b; --card:#19212a; --ink:#e7edf3; --muted:#9dabb9; --line:#2d3946;
+  --low:#7fd3a0; --low-bg:#173324; --med:#f1c46b; --med-bg:#3a2c0f; --high:#ff8f86; --high-bg:#3f1714; color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding-bottom:100px}
+header{background:#1f6fc9;color:#fff;padding:20px 16px 18px;padding-top:max(20px,env(safe-area-inset-top))}
+header .in{max-width:760px;margin:0 auto;display:flex;flex-direction:column-reverse;gap:12px}
+header .txt{min-width:0}
+header .logo{display:block;height:24px;width:auto;max-width:100%;align-self:flex-end}
+@media (min-width:600px){header .in{flex-direction:row;align-items:flex-start;justify-content:space-between;gap:20px}header .logo{height:30px;flex:none;margin-top:2px}}
+header h1{margin:0 0 4px;font-size:1.35rem;line-height:1.2}
+header p{margin:0;opacity:.92;font-size:.92rem}
+main{max-width:760px;margin:0 auto;padding:8px 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:14px 0}
+.card>h2{margin:0 0 4px;font-size:1.12rem;display:flex;gap:10px;align-items:center}
+.step{background:var(--brand);color:var(--brand-ink);border-radius:50%;width:26px;height:26px;display:inline-grid;place-items:center;font-size:.85rem;flex:none}
+.hint{color:var(--muted);font-size:.9rem;margin:0 0 10px}
+.i{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-left:6px;border-radius:50%;border:1.5px solid var(--brand);color:var(--brand-text);font:italic 700 13px/1 Georgia,serif;vertical-align:middle;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.i[aria-expanded="true"]{background:var(--brand);color:var(--brand-ink)}
+.i:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.infoBox{background:var(--brand-soft);color:var(--ink);border-radius:10px;padding:10px 12px;margin:6px 0 0;font-size:.88rem;font-weight:400;line-height:1.45}
+.infoBox b{font-weight:600}
+label.f{display:block;font-weight:600;font-size:.92rem;margin:12px 0 0;min-width:0}
+.req{color:var(--high)}
+input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{width:100%;margin-top:6px;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+textarea{resize:vertical;min-height:44px;overflow:hidden}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.two.stack{grid-template-columns:1fr}}
+.invalid{border-color:var(--high)!important}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 14px;font-weight:600;min-height:44px}
+.btn.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.btn.small{min-height:34px;padding:5px 10px;font-size:.85rem}
+.btn.danger{color:var(--high)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.6}
+
+/* segmented choices */
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.seg label{flex:1;min-width:64px;position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;text-align:center;padding:8px 4px;border:1px solid var(--line);border-radius:10px;font-weight:600;font-size:.88rem;background:var(--card);cursor:pointer;user-select:none}
+.seg input:checked+span{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.seg input:checked+span.g{background:var(--low-bg);color:var(--low);border-color:var(--low)}
+.seg input:checked+span.a{background:var(--med-bg);color:var(--med);border-color:var(--med)}
+.seg input:checked+span.r{background:var(--high-bg);color:var(--high);border-color:var(--high)}
+.seg input:checked+span.n{background:var(--bg);color:var(--muted);border-color:var(--muted)}
+.seg input:focus-visible+span{outline:2px solid var(--brand);outline-offset:2px}
+
+/* key */
+details.key{background:var(--brand-soft);border-radius:10px;padding:10px 12px;font-size:.9rem;margin-bottom:10px}
+details.key summary{font-weight:700;cursor:pointer}
+details.key table{border-collapse:collapse;margin-top:8px;width:100%}
+details.key td{padding:3px 4px;vertical-align:top}
+
+/* categories */
+details.cat{border:1px solid var(--line);border-radius:12px;margin:10px 0;background:var(--card)}
+details.cat>summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;align-items:center;gap:10px}
+details.cat>summary::-webkit-details-marker{display:none}
+details.cat>summary .t{flex:1;font-weight:700;min-width:0}
+details.cat>summary .chev{transition:transform .15s;color:var(--muted)}
+details.cat[open]>summary .chev{transform:rotate(90deg)}
+.prog{font-size:.78rem;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--bg);color:var(--muted);white-space:nowrap}
+.prog.done{background:var(--low-bg);color:var(--low)}
+.catBody{padding:0 14px 12px}
+.hz{border-top:1px solid var(--line);padding:14px 0}
+.hz:first-child{border-top:0;padding-top:4px}
+.hz.na .hzRest{display:none}
+.hz.na .hzTitle{color:var(--muted);text-decoration:line-through}
+.hzTop{display:flex;gap:10px;align-items:flex-start}
+.hzNum{background:var(--brand-soft);color:var(--brand-text);font-weight:700;border-radius:8px;padding:2px 8px;font-size:.85rem;flex:none;margin-top:2px}
+.hzTitle{font-weight:700;margin:0;flex:1;min-width:0}
+.hzTitle textarea{font-weight:700;margin-top:0}
+.who{color:var(--muted);font-size:.88rem;margin:2px 0 0}
+.sub{font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 0;font-weight:700}
+.rate{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;align-items:end}
+.rate .badge{grid-column:1/-1;margin-top:8px}
+.badge{font-weight:700;font-size:.85rem;padding:6px 10px;border-radius:10px;text-align:center;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.badge.low{background:var(--low-bg);color:var(--low);border-color:transparent}
+.badge.med{background:var(--med-bg);color:var(--med);border-color:transparent}
+.badge.high{background:var(--high-bg);color:var(--high);border-color:transparent}
+.rate select{padding-left:8px;padding-right:4px}
+
+/* checklists */
+.chk{border-top:1px solid var(--line);padding:10px 0}
+.chk:first-child{border-top:0}
+.chk p{margin:0;font-weight:500}
+.chk.concern{background:var(--high-bg);margin:0 -16px;padding:10px 16px}
+.chk textarea{margin-top:8px;min-height:38px;padding:7px 10px;font-size:.9rem}
+
+/* photos */
+.addRow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.filebtn{position:relative;display:block}
+.filebtn input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.photos{display:grid;gap:12px;margin-top:12px}
+.photo{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:start}
+.photo img{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid var(--line);max-width:100%}
+.photo textarea{margin-top:0}
+
+/* signature */
+.sig-wrap{border:1px dashed var(--muted);border-radius:10px;background:#fff;margin-top:6px;touch-action:none}
+canvas#sig{display:block;width:100%;height:150px}
+.row{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.muted{color:var(--muted)}
+
+/* bar + sheet */
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));z-index:5}
+.bar .in{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.status{font-size:.82rem;color:var(--muted);flex:1;min-width:0}
+.status.err{color:var(--high)}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:10}
+.sheet.open{display:flex}
+.sheet .panel{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:20px 16px;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.sheet h2{margin:0 0 6px;font-size:1.15rem}
+.sheet .actions{display:grid;gap:10px;margin-top:14px}
+.confirmBox{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.9rem}
+footer{text-align:center;color:var(--muted);font-size:.8rem;margin:20px 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* fire drill extras */
+.timer{text-align:center;background:var(--brand-soft);border-radius:12px;padding:16px 12px;margin:6px 0 4px}
+.clock{font:700 2.8rem/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;color:var(--brand-text)}
+.clockSub{font-size:.86rem;color:var(--muted);margin-top:6px}
+.tBtns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.tBtns .btn.primary{flex:1;min-height:52px;font-size:1rem}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:12px}
+.res{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.res b{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.res span{font-size:.8rem;color:var(--muted)}
+.res.ok{background:var(--low-bg);border-color:transparent}.res.ok b{color:var(--low)}
+.res.bad{background:var(--high-bg);border-color:transparent}.res.bad b{color:var(--high)}
+.three{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+h3.grp{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:18px 0 2px}
+h3.grp:first-child{margin-top:4px}
+.chk.part{background:var(--med-bg);margin:0 -16px;padding:10px 16px}
+.act{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0}
+.act .hzNum{display:inline-block;margin-bottom:2px}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div class="txt"><h1>Fire Drill Record</h1>
+  <p id="hdrSite">Safar Academy</p></div>
+  <img class="logo" id="logoImg" alt="Safar Academy" src="data:image/png;base64,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">
+</div></header>
+
+<main>
+<form id="f" autocomplete="off" onsubmit="return false">
+
+<section class="card">
+  <h2><span class="step">1</span>Drill details</h2>
+  <p class="hint">The Fire Safety Policy asks every branch to run a fire drill at least once a year and keep a log of it. Fill this in on the day. Your answers save on this device as you go.</p>
+  <div class="two stack">
+    <label class="f">Branch <span class="req">*</span><select name="branch" id="branch" required><option value="">Choose…</option><option>Edmonton</option><option>Enfield</option><option>Finchley</option><option>Harlow</option><option>Slough</option></select></label>
+    <label class="f">Venue type<select name="venueType"><option value="">Choose…</option><option>School</option><option>Mosque</option></select></label>
+  </div>
+  <label class="f">Venue name and address <span class="req">*</span><textarea name="venue" rows="2" required></textarea></label>
+  <div class="two stack">
+    <label class="f">Date of drill <span class="req">*</span><input type="date" name="date" required></label>
+    <label class="f">Type of drill<select name="drillType"><option value="">Choose…</option><option>Planned: staff and pupils told beforehand</option><option>Unannounced to pupils</option><option>Joint drill with other groups using the building</option><option>Real alarm or false alarm</option></select></label>
+  </div>
+  <div class="two stack">
+    <label class="f">When in the session<select name="period"><option value="">Choose…</option><option>During a lesson</option><option>At break time</option><option>Between lessons</option><option>Memorisation period</option><option>At arrival or home time</option></select></label>
+    <label class="f">How the alarm was raised<select name="alarmMethod"><option value="">Choose…</option><option>Venue fire alarm</option><option>Bell</option><option>Whistle (short blasts)</option><option>Air horn</option><option>Verbal, room by room</option></select></label>
+  </div>
+  <label class="f">Scenario used<textarea name="scenario" rows="2" placeholder="e.g. Fire in the kitchen, so the rear exit is treated as blocked"></textarea></label>
+  <label class="f">Assembly point(s) used<textarea name="ap" rows="2"></textarea></label>
+  <div class="two stack">
+    <label class="f">Fire warden running the drill <span class="req">*</span><input type="text" name="warden" autocomplete="name" required></label>
+    <label class="f">Fire marshals on duty<input type="text" name="marshals"></label>
+  </div>
+  <div class="two stack">
+    <label class="f">Venue contact told about the drill<input type="text" name="venueContact" placeholder="Name and phone"></label>
+    <label class="f">Other groups in the building at the time<input type="text" name="otherHirers" placeholder="Write None if there were none"></label>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="step">2</span>Before the drill</h2>
+  <p class="hint">Tick what was done before the alarm went off.</p>
+  <div id="prepList"></div>
+</section>
+
+<section class="card">
+  <h2><span class="step">3</span>Timings</h2>
+  <p class="hint">Use the clock on the day: tap the button at each stage and the time is recorded. You can also type or correct the times below.</p>
+  <div class="timer">
+    <div class="clock" id="clock" aria-live="off">0:00</div>
+    <div class="clockSub" id="clockSub">Tap the button when the alarm sounds</div>
+    <div class="tBtns"><button type="button" class="btn primary" id="tNext">Alarm sounded: start the clock</button><button type="button" class="btn" id="tUndo" hidden>Undo</button></div>
+  </div>
+  <div class="two">
+    <label class="f">Alarm sounded<input type="time" step="1" name="tAlarm"></label>
+    <label class="f">Last person out<input type="time" step="1" name="tOut"></label>
+  </div>
+  <div class="two">
+    <label class="f">Registers and headcounts done<input type="time" step="1" name="tReg"></label>
+    <label class="f">All clear given<input type="time" step="1" name="tClear"></label>
+  </div>
+  <div class="results" id="results"></div>
+</section>
+
+<section class="card">
+  <h2><span class="step">4</span>Headcount</h2>
+  <p class="hint">Numbers on site when the alarm sounded, and how many were accounted for at the first count at the assembly point.</p>
+  <div class="two">
+    <label class="f">Pupils on today's registers<input type="number" inputmode="numeric" min="0" name="pupilsOn"></label>
+    <label class="f">Pupils accounted for<input type="number" inputmode="numeric" min="0" name="pupilsAcc"></label>
+  </div>
+  <div class="two">
+    <label class="f">Staff and volunteers on site<input type="number" inputmode="numeric" min="0" name="staffOn"></label>
+    <label class="f">Staff and volunteers accounted for<input type="number" inputmode="numeric" min="0" name="staffAcc"></label>
+  </div>
+  <div class="two">
+    <label class="f">Visitors and parents on site<input type="number" inputmode="numeric" min="0" name="visOn"></label>
+    <label class="f">Visitors and parents accounted for<input type="number" inputmode="numeric" min="0" name="visAcc"></label>
+  </div>
+  <div class="results" id="countRes"></div>
+  <label class="f">Anyone not accounted for at first count, and why<textarea name="missing" rows="2" placeholder="e.g. One pupil collected early but not signed out; found on the register later"></textarea></label>
+</section>
+
+<section class="card">
+  <h2><span class="step">5</span>What you saw</h2>
+  <p class="hint">Watch the evacuation and answer each one afterwards. Anything marked No or Partly should get an action in step 6.</p>
+  <div id="obsList"></div>
+  <h3 class="grp">Notes for the log</h3>
+  <label class="f">Inappropriate behaviour noticed<textarea name="behaviour" rows="2"></textarea></label>
+  <label class="f">Difficulties people had, especially anyone with a disability<textarea name="difficulties" rows="2"></textarea></label>
+  <label class="f">Problems with the escape routes or assembly point<textarea name="routes" rows="2"></textarea></label>
+</section>
+
+<section class="card">
+  <h2><span class="step">6</span>Problems and actions</h2>
+  <p class="hint">List each thing that needs fixing, who will sort it, and by when.</p>
+  <div id="acts"></div>
+  <button type="button" class="btn small" id="addAct" style="margin-top:4px">+ Add an action</button>
+  <div class="two stack" style="margin-top:6px">
+    <label class="f">Findings added to the fire risk assessment?<select name="fra"><option value="">Choose…</option><option>Yes</option><option>Not yet</option><option>No significant findings</option></select></label>
+    <label class="f">Joint drill with other groups in the building<select name="jointDrill"><option value="">Choose…</option><option>Not needed: no other groups</option><option>This was the joint drill</option><option>Still to arrange</option></select></label>
+  </div>
+  <label class="f">Overall result<select name="outcome"><option value="">Choose…</option><option>Successful: no changes needed</option><option>Successful, with actions to follow up</option><option>Not satisfactory: repeat the drill</option></select></label>
+</section>
+
+<section class="card">
+  <h2><span class="step">7</span>Photos <span class="muted" style="font-weight:400;font-size:.9rem">(optional)</span></h2>
+  <p class="hint">Add photos of anything that slowed the evacuation, for example a blocked exit, a locked gate or a crowded assembly point.</p>
+  <div class="addRow">
+    <div class="filebtn"><button type="button" class="btn block" tabindex="-1">Take photo</button><input type="file" id="camIn" accept="image/*" capture="environment" aria-label="Take photo"></div>
+    <div class="filebtn"><button type="button" class="btn block" tabindex="-1">From photos</button><input type="file" id="libIn" accept="image/*" multiple aria-label="Choose from photos"></div>
+  </div>
+  <div class="photos" id="photos"></div>
+</section>
+
+<section class="card">
+  <h2><span class="step">8</span>Sign-off</h2>
+  <label class="f">Staff debriefed after the drill (names)<textarea name="briefed" rows="2"></textarea></label>
+  <div class="two stack">
+    <label class="f">Reviewed by (Academy Head)<input type="text" name="approver"></label>
+    <label class="f">Date reviewed<input type="date" name="approveDate"></label>
+  </div>
+  <div class="two stack">
+    <label class="f">Shared with venue contact (name)<input type="text" name="sharedWith"></label>
+    <label class="f">Next drill due<input type="date" name="nextDrill"></label>
+  </div>
+  <div class="f" id="sigLabel" style="font-weight:600;font-size:.92rem;margin-top:12px">Signature (fire warden)</div>
+  <div class="sig-wrap"><canvas id="sig" aria-label="Signature pad"></canvas></div>
+  <div class="row" style="margin-top:6px"><span class="muted" style="font-size:.85rem">Sign with your finger</span><button type="button" class="btn small" id="sigClear">Clear signature</button></div>
+</section>
+
+<div class="confirmBox" id="resetBox"></div>
+</form>
+<footer>Your answers stay on this device. Nothing is uploaded. When you're done, email the PDF to the office at <a href="mailto:management@safaracademy.org" style="color:inherit">management@safaracademy.org</a>.</footer>
+</main>
+
+<div class="bar"><div class="in">
+  <div class="status" id="status" role="status">Draft saves automatically</div>
+  <button type="button" class="btn primary" id="pdfBtn">Create PDF</button>
+</div></div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="panel">
+    <h2 id="sheetTitle">PDF ready</h2>
+    <p class="muted" id="sheetName" style="margin:0;word-break:break-all"></p>
+    <p style="margin:10px 0 0">Send it to the office at <a href="mailto:management@safaracademy.org?subject=Fire%20drill%20record">management@safaracademy.org</a>. If you share by email, add this address as the recipient.</p>
+    <div class="actions">
+      <button type="button" class="btn primary block" id="shareBtn">Share PDF (WhatsApp, email…)</button>
+      <button type="button" class="btn block" id="dlBtn">Download PDF</button>
+      <button type="button" class="btn block" id="closeSheet">Back to form</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+(function(){
+'use strict';
+var STORE='safar-fire-drill-v1';
+
+/* ---------- content from the Fire Safety Policy (section 5 and the emergency plan) ---------- */
+var PREP=[
+ 'Staff told the drill would take place, and the evacuation procedure gone through with them',
+ 'Pupils told about the drill and reminded of their exit route and assembly point',
+ 'Venue contact told the date and time, so the alarm isn\'t reported to the fire service by mistake',
+ 'Other groups using the building told about the drill',
+ 'Fire marshals given areas to sweep and an assembly point each',
+ 'Teachers have their emailed or printed register to hand, including for covered or split classes',
+ 'Anyone needing a personal emergency evacuation plan (PEEP) identified, and their helper briefed',
+ 'Way of raising the alarm agreed (venue alarm, bell, whistle or air horn)'
+];
+var OBS=[
+ {t:'Raising the alarm and leaving',q:[
+  'Alarm heard clearly in every room in use, including toilets and wudu areas',
+  'Classes stopped straight away and left calmly',
+  'Pupils walked briskly and did not run',
+  'Pupils stayed silent so instructions could be heard',
+  'No one went back for bags or coats (at mosques, no one stopped for shoes)',
+  'Everyone used the correct escape route',
+  'Fire exits and routes were clear, and exit doors opened easily',
+  'Windows and doors closed behind people where possible',
+  'No one used a lift']},
+ {t:'Sweep and people needing help',q:[
+  'Marshals checked every room, toilet, stock room and cupboard, starting furthest from the exit',
+  'Anyone with a disability or a PEEP got out safely with their helper',
+  'Pupils out of class (toilet, wudu, break) were found and brought out']},
+ {t:'At the assembly point',q:[
+  'Classes lined up by the class they were last in',
+  'Registers taken from the emailed register, then a headcount of each line',
+  'Covered or split classes accounted for by the person who took their register',
+  'Teachers raised their hands once their register was complete',
+  'Any register concern reported to a fire marshal straight away',
+  'Assembly point safe, away from traffic, and big enough for everyone']},
+ {t:'Going back in',q:[
+  'No one went back inside until the fire marshal or venue gave the all clear',
+  'Classes went back in an orderly way, one class at a time']}
+];
+/* Branch details filled in when a branch is chosen. Assembly points come from section 7 of the Fire Safety Policy. Fields stay editable. */
+var BRANCHES={
+ Edmonton:{venue:'Edmonton Islamic Centre\n20-34 Raynham Road, London, N18 2SJ',type:'Mosque',ap:'Assembly Point 1: car park outside Best Tutors (all halls except the Main Hall)\nAssembly Point 2: Wakefield Street (Main Hall)'},
+ Enfield:{venue:'Enfield County School\nHolly Walk, Enfield, EN2 6QG',type:'School',ap:'Tennis courts on the far side of the playground'},
+ Finchley:{venue:'IANL\n685 High Road, London, N12 0DA',type:'Mosque',ap:'Front car park'},
+ Harlow:{venue:'Passmores Academy\nTracyes Road, Harlow, Essex, CM18 6JH',type:'School',ap:'Front entrance of the Academy, outside reception'},
+ Slough:{venue:'Masjid Al Jannah\n1 Stoke Road, Slough, West Berkshire, SL2 5AH',type:'Mosque',ap:'Rear entrance of the mosque, near Bristol Way'}
+};
+/* Explanations shown when staff tap the (i) next to a question */
+var INFO={
+ branch:'Choose your branch. The venue, venue type and assembly points fill in from the Fire Safety Policy. Check them and correct anything that has changed.',
+ drillType:'The policy says staff and pupils should be told a drill is happening. A real or false alarm can be logged here too, because the same lessons apply.',
+ period:'When the alarm went off. Drills at break or between lessons test whether pupils know to line up by the class they were last in.',
+ alarmMethod:'How people knew to leave. If the venue alarm is linked to the fire service, the venue must know about the drill in advance.',
+ scenario:'Optional. Pretending one exit is blocked by the fire tests whether staff use another route.',
+ ap:'Where everyone gathered. Edmonton has two assembly points: write down which classes went to which.',
+ warden:'The Head or Deputy Head of Branch is the fire warden and arranges the drill. This person signs the record.',
+ marshals:'The Head of Branch and admin staff act as fire marshals: they sweep the rooms, check the registers and speak to the fire service.',
+ venueContact:'Tell the venue before the drill, especially if their alarm calls the fire service automatically.',
+ otherHirers:'If other groups use the building at the same time, the policy asks for an extra drill with all of them on site.',
+ tAlarm:'Tap the button on the clock above as the alarm sounds, or type the time here.',
+ tOut:'When the last person left the building, after the marshals finished their sweep.',
+ tReg:'When every teacher had raised their hand to show their register and headcount were complete.',
+ tClear:'When the fire marshal or venue said it was safe to go back in.',
+ pupilsOn:'The number of pupils marked present on today\'s registers when the alarm sounded.',
+ missing:'Record any gap at the first count, even if the person was found quickly. Register mistakes are one of the most useful things a drill shows up.',
+ behaviour:'The policy asks the fire warden to note any inappropriate behaviour, such as running, talking or going back for belongings.',
+ difficulties:'Note anyone who struggled, for example a pupil with a disability, younger pupils on stairs, or someone who didn\'t hear the alarm.',
+ routes:'Note any route that was slow, crowded, blocked or confusing, and any problem at the assembly point.',
+ fra:'The policy asks for significant findings to be recorded in the branch fire risk assessment.',
+ jointDrill:'If other groups use the building while we\'re there, the policy asks for an extra drill when all of them are on site, to copy a real emergency.',
+ outcome:'Repeat the drill soon if people couldn\'t be accounted for, the alarm wasn\'t heard, or exits were blocked.',
+ briefed:'The names of staff and volunteers you talked to after the drill about what went well and what to change.',
+ nextDrill:'The policy asks for at least one drill a year. Many branches do one each term, and a new branch or venue should do one in the first few weeks.',
+ sig:'Your signature confirms you ran this drill and that the record is accurate to the best of your knowledge.'
+};
+var STAGES=[['tAlarm','Alarm sounded: start the clock'],['tOut','Last person out of the building'],['tReg','All registers and headcounts done'],['tClear','All clear given']];
+var OBSOPTS={vals:[['Yes','g'],['Partly','a'],['No','r'],['N/A','n']]};
+var PREPOPTS={vals:[['Done','g'],['Not yet','r'],['N/A','n']]};
+
+/* ---------- state ---------- */
+var prep={}, obs={}, acts=[], photos=[], sigData=null, tStart=null;
+var form=document.getElementById('f');
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function grow(el){ if(!el||el.tagName!=='TEXTAREA') return; el.style.height='auto'; el.style.height=(el.scrollHeight+2)+'px'; }
+function growAll(root){ Array.prototype.forEach.call((root||document).querySelectorAll('textarea'),grow); }
+document.addEventListener('input',function(e){ grow(e.target); });
+function setStatus(m,err){ var s=$('status'); s.textContent=m; s.className='status'+(err?' err':''); }
+function F(n){ return form.elements[n]; }
+
+/* ---------- checklists ---------- */
+function chkHTML(list,store,prefix,opts){
+  return list.map(function(q,i){ var id=prefix+i, v=(store[id]||{}).v||'', note=(store[id]||{}).n||'';
+    return '<div class="chk'+cc(v)+'" data-id="'+id+'"><p>'+esc(q)+'</p><div class="seg">'+opts.vals.map(function(o){return '<label><input type="radio" name="c_'+id+'" value="'+o[0]+'"'+(v===o[0]?' checked':'')+'><span class="'+o[1]+'">'+o[0]+'</span></label>';}).join('')+'</div>'+
+      '<textarea rows="1" data-note="'+id+'" placeholder="Note (optional)">'+esc(note)+'</textarea></div>'; }).join('');
+}
+function cc(v){ return (v==='No'||v==='Not yet')?' concern':v==='Partly'?' part':''; }
+function renderPrep(){ $('prepList').innerHTML=chkHTML(PREP,prep,'p',PREPOPTS); growAll($('prepList')); }
+function renderObs(){ var n=0; $('obsList').innerHTML=OBS.map(function(g,gi){ var h='<h3 class="grp">'+esc(g.t)+'</h3>'+chkHTML(g.q,obs,'o'+gi+'_',OBSOPTS); return h; }).join(''); growAll($('obsList')); }
+function onChk(store){ return function(e){ var t=e.target, box=t.closest('.chk'); if(!box) return; var id=box.dataset.id; store[id]=store[id]||{};
+  if(t.type==='radio'){ store[id].v=t.value; box.className='chk'+cc(t.value); } else if(t.dataset.note!=null){ store[id].n=t.value; } saveSoon(); }; }
+$('prepList').addEventListener('change',onChk(prep)); $('prepList').addEventListener('input',onChk(prep));
+$('obsList').addEventListener('change',onChk(obs)); $('obsList').addEventListener('input',onChk(obs));
+
+/* ---------- actions ---------- */
+function blankAct(){ return {issue:'',action:'',owner:'',due:''}; }
+function renderActs(){
+  if(!acts.length) acts.push(blankAct());
+  $('acts').innerHTML=acts.map(function(a,i){ return '<div class="act" data-i="'+i+'"><span class="hzNum">'+(i+1)+'</span>'+
+    '<label class="f">Problem found<textarea data-a="issue" rows="1" placeholder="e.g. Rear fire exit was locked">'+esc(a.issue)+'</textarea></label>'+
+    '<label class="f">Action to fix it<textarea data-a="action" rows="1" placeholder="e.g. Ask the caretaker to unlock it before every session">'+esc(a.action)+'</textarea></label>'+
+    '<div class="two"><label class="f">Owner<input type="text" data-a="owner" value="'+esc(a.owner)+'"></label><label class="f">By when<input type="date" data-a="due" value="'+esc(a.due)+'"></label></div>'+
+    (acts.length>1?'<div class="row" style="justify-content:flex-end;margin-top:10px"><button type="button" class="btn small danger" data-rmact="'+i+'">Remove</button></div>':'')+'</div>'; }).join('');
+  growAll($('acts'));
+}
+$('acts').addEventListener('input',function(e){ var k=e.target.dataset.a; if(!k) return; acts[+e.target.closest('.act').dataset.i][k]=e.target.value; saveSoon(); });
+$('acts').addEventListener('click',function(e){ var i=e.target.getAttribute('data-rmact'); if(i==null) return; var b=e.target;
+  if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Tap again to remove'; setTimeout(function(){ if(b.isConnected){ delete b.dataset.sure; b.textContent='Remove'; } },4000); return; }
+  acts.splice(+i,1); renderActs(); saveSoon(); });
+$('addAct').addEventListener('click',function(){ acts.push(blankAct()); renderActs(); saveSoon(); var all=$('acts').querySelectorAll('.act'), last=all[all.length-1]; last.scrollIntoView({behavior:'smooth',block:'center'}); last.querySelector('textarea').focus({preventScroll:true}); });
+function liveActs(){ return acts.filter(function(a){ return (a.issue||'').trim()||(a.action||'').trim(); }); }
+
+/* ---------- timings ---------- */
+function pad(n){ return (n<10?'0':'')+n; }
+function nowHMS(){ var d=new Date(); return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()); }
+function secs(v){ var m=String(v||'').match(/^(\d{1,2})[:.](\d{2})(?:[:.](\d{2}))?$/); return m?(+m[1])*3600+(+m[2])*60+(+(m[3]||0)):null; }
+function gap(a,b){ var x=secs(F(a).value), y=secs(F(b).value); return (x==null||y==null||y<x)?null:y-x; }
+function dur(s){ if(s==null) return ''; var m=Math.floor(s/60), r=s%60; return m?(m+' min'+(r?' '+r+' s':'')):r+' s'; }
+function clockTxt(s){ return Math.floor(s/60)+':'+pad(s%60); }
+function stage(){ for(var i=0;i<STAGES.length;i++){ if(!F(STAGES[i][0]).value) return i; } return STAGES.length; }
+function renderTimer(){
+  var st=stage(); var nb=$('tNext');
+  if(st<STAGES.length){ nb.hidden=false; nb.textContent=STAGES[st][1]; } else nb.hidden=true;
+  $('tUndo').hidden=(st===0);
+  var R=[['tAlarm','tOut','Everyone out'],['tAlarm','tReg','Registers done'],['tAlarm','tClear','Alarm to all clear']];
+  $('results').innerHTML=R.map(function(r){ var g=gap(r[0],r[1]); return '<div class="res"><b>'+(g==null?'–':dur(g))+'</b><span>'+r[2]+'</span></div>'; }).join('');
+  tick();
+}
+function tick(){
+  var st=stage(), c=$('clock'), sub=$('clockSub');
+  if(st===0){ c.textContent='0:00'; sub.textContent='Tap the button when the alarm sounds'; return; }
+  if(st<STAGES.length && tStart){ c.textContent=clockTxt(Math.max(0,Math.floor((Date.now()-tStart)/1000))); sub.textContent='Clock running since the alarm at '+F('tAlarm').value.slice(0,5); return; }
+  var last=null; for(var i=STAGES.length-1;i>0;i--){ var g=gap('tAlarm',STAGES[i][0]); if(g!=null){ last=g; break; } }
+  c.textContent=last==null?'0:00':clockTxt(last);
+  sub.textContent=st===STAGES.length?'Drill complete: times recorded below':'Alarm at '+F('tAlarm').value.slice(0,5)+'. Tap the button at the next stage.';
+}
+setInterval(function(){ if(tStart && stage()<STAGES.length && stage()>0) tick(); },250);
+$('tNext').addEventListener('click',function(){ var st=stage(); if(st>=STAGES.length) return; var el=F(STAGES[st][0]); el.value=nowHMS();
+  if(st===0){ tStart=Date.now(); if(!F('date').value) F('date').value=today(); }
+  renderTimer(); saveSoon(); });
+$('tUndo').addEventListener('click',function(){ var st=stage(); if(st===0) return; F(STAGES[st-1][0]).value=''; if(st-1===0) tStart=null; renderTimer(); saveSoon(); });
+
+/* ---------- headcount ---------- */
+function num(n){ var v=F(n).value; return v===''?null:+v; }
+function renderCount(){
+  var G=[['pupilsOn','pupilsAcc','Pupils'],['staffOn','staffAcc','Staff and volunteers'],['visOn','visAcc','Visitors and parents']], out=[], miss=0, any=false;
+  G.forEach(function(g){ var on=num(g[0]), acc=num(g[1]); if(on==null&&acc==null) return; any=true;
+    var m=(on!=null&&acc!=null)?on-acc:null; if(m>0) miss+=m;
+    out.push('<div class="res'+(m==null?'':m>0?' bad':' ok')+'"><b>'+(acc==null?'–':acc)+' of '+(on==null?'–':on)+'</b><span>'+g[2]+'</span></div>'); });
+  if(any) out.unshift('<div class="res '+(miss?'bad':'ok')+'"><b>'+(miss?miss+' missing':'All present')+'</b><span>At first count</span></div>');
+  $('countRes').innerHTML=out.join('');
+}
+function countSummary(){ var parts=[], miss=0;
+  [['pupilsOn','pupilsAcc','pupils'],['staffOn','staffAcc','staff and volunteers'],['visOn','visAcc','visitors and parents']].forEach(function(g){ var on=num(g[0]),acc=num(g[1]); if(on==null&&acc==null) return; parts.push((acc==null?'-':acc)+' of '+(on==null?'-':on)+' '+g[2]); if(on!=null&&acc!=null&&on>acc) miss+=on-acc; });
+  return {txt:parts.join(', '),miss:miss,any:parts.length>0}; }
+
+/* ---------- photos ---------- */
+function loadImage(file){ return new Promise(function(res,rej){ var url=URL.createObjectURL(file), img=new Image();
+  img.onload=function(){ var max=1400,w=img.naturalWidth,h=img.naturalHeight,k=Math.min(1,max/Math.max(w,h)); var c=document.createElement('canvas'); c.width=Math.round(w*k); c.height=Math.round(h*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url); res({data:c.toDataURL('image/jpeg',0.72),w:c.width,h:c.height,caption:''}); };
+  img.onerror=function(){ URL.revokeObjectURL(url); rej(new Error('bad')); }; img.src=url; }); }
+function renderPhotos(){ $('photos').innerHTML=photos.map(function(p,i){ return '<div class="photo"><img src="'+p.data+'" alt="Photo '+(i+1)+'"><div><textarea rows="2" data-cap="'+i+'" placeholder="Caption, e.g. Gate to assembly point was locked">'+esc(p.caption)+'</textarea><button type="button" class="btn small danger" data-rm="'+i+'" style="margin-top:6px">Remove</button></div></div>'; }).join(''); }
+function addFiles(e){ var files=Array.prototype.slice.call(e.target.files||[]); if(!files.length) return; setStatus('Adding photos…');
+  Promise.all(files.map(function(f){ return loadImage(f).catch(function(){ return null; }); })).then(function(list){ var bad=0; list.forEach(function(p){ if(p) photos.push(p); else bad++; }); renderPhotos(); e.target.value=''; saveSoon(); setStatus(bad?bad+' file(s) could not be read. Try a JPG or PNG.':photos.length+' photo'+(photos.length===1?'':'s')+' added',!!bad); }); }
+$('camIn').addEventListener('change',addFiles); $('libIn').addEventListener('change',addFiles);
+$('photos').addEventListener('input',function(e){ var i=e.target.getAttribute('data-cap'); if(i!=null){ photos[+i].caption=e.target.value; saveSoon(); } });
+$('photos').addEventListener('click',function(e){ var i=e.target.getAttribute('data-rm'); if(i==null) return; photos.splice(+i,1); renderPhotos(); saveSoon(); });
+
+/* ---------- signature ---------- */
+var cv=$('sig'), ctx=cv.getContext('2d'), drawing=false;
+function sizeCanvas(){ var r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1; cv.width=Math.max(1,Math.round(r.width*dpr)); cv.height=Math.max(1,Math.round(r.height*dpr)); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineWidth=2.4; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#111';
+  if(sigData){ var im=new Image(); im.onload=function(){ ctx.drawImage(im,0,0,r.width,r.height); }; im.src=sigData; } }
+function pt(e){ var r=cv.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; }
+cv.addEventListener('pointerdown',function(e){ drawing=true; cv.setPointerCapture(e.pointerId); var p=pt(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x+.1,p.y+.1); ctx.stroke(); e.preventDefault(); });
+cv.addEventListener('pointermove',function(e){ if(!drawing) return; var p=pt(e); ctx.lineTo(p.x,p.y); ctx.stroke(); e.preventDefault(); });
+function endSig(){ if(!drawing) return; drawing=false; sigData=cv.toDataURL('image/png'); saveSoon(); }
+cv.addEventListener('pointerup',endSig); cv.addEventListener('pointercancel',endSig);
+$('sigClear').addEventListener('click',function(){ ctx.clearRect(0,0,cv.width,cv.height); sigData=null; saveSoon(); });
+
+/* ---------- save / restore (IndexedDB) ---------- */
+var dbp=null;
+function idb(){ if(dbp) return dbp; dbp=new Promise(function(res){ try{ var q=indexedDB.open('safar-fire-drill',1); q.onupgradeneeded=function(){ q.result.createObjectStore('kv'); }; q.onsuccess=function(){ res(q.result); }; q.onerror=function(){ res(null); }; }catch(e){ res(null); } }); return dbp; }
+function idbGet(k){ return idb().then(function(db){ if(!db) return null; return new Promise(function(res){ try{ var q=db.transaction('kv').objectStore('kv').get(k); q.onsuccess=function(){ res(q.result||null); }; q.onerror=function(){ res(null); }; }catch(e){ res(null); } }); }); }
+function idbSet(k,v){ return idb().then(function(db){ if(!db) return false; return new Promise(function(res){ try{ var tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=function(){ res(true); }; tx.onerror=function(){ res(false); }; }catch(e){ res(false); } }); }); }
+function idbDel(k){ return idb().then(function(db){ if(!db) return; try{ db.transaction('kv','readwrite').objectStore('kv').delete(k); }catch(e){} }); }
+function collect(){ var d={}; Array.prototype.forEach.call(form.elements,function(el){ if(el.name && el.type!=='radio' && el.type!=='file') d[el.name]=el.value; }); return d; }
+var t;
+function saveSoon(){ clearTimeout(t); t=setTimeout(save,400); }
+function save(){ return idbSet(STORE,{f:collect(),prep:prep,obs:obs,acts:acts,photos:photos,sig:sigData,tStart:tStart,at:Date.now()}).then(function(ok){ setStatus(ok?'Draft saved on this device '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'Could not save a draft. Keep this page open until you create the PDF.',!ok); }); }
+function applyFields(f){ var bs=F('branch'), bv=(f||{}).branch; if(bv && !Array.prototype.some.call(bs.options,function(o){return o.value===bv;})){ var o=document.createElement('option'); o.textContent=bv; bs.appendChild(o); }
+  Object.keys(f||{}).forEach(function(k){ var el=form.elements[k]; if(el && el.type!=='file' && (el.tagName==='SELECT'||!el.length)) el.value=f[k]; }); }
+
+form.addEventListener('input',function(e){ var n=e.target.name; if(!n||e.target.closest('.chk,.act')) return; e.target.classList.remove('invalid');
+  if(n==='tAlarm') tStart=null; if(/^t[A-Z]/.test(n)) renderTimer(); if(/On$|Acc$/.test(n)) renderCount(); saveSoon(); updateHeader(); });
+function isPrefill(field,val){ val=String(val||'').trim(); if(!val) return true; return Object.keys(BRANCHES).some(function(k){ return BRANCHES[k][field]===val; }); }
+function fillBranch(){ var b=BRANCHES[F('branch').value]; if(!b) return;
+  [['venue','venue'],['venueType','type'],['ap','ap']].forEach(function(p){ var el=F(p[0]); if(isPrefill(p[1],el.value)){ el.value=b[p[1]]; el.classList.remove('invalid'); } });
+  grow(F('venue')); grow(F('ap')); }
+form.addEventListener('change',function(e){ var n=e.target.name; if(!n||e.target.closest('.chk,.act')) return; if(n==='branch'){ fillBranch(); updateHeader(); } if(/^t[A-Z]/.test(n)) renderTimer(); saveSoon(); });
+function updateHeader(){ var b=F('branch').value.trim(), dt=F('date').value; $('hdrSite').textContent='Safar Academy'+(b?' · '+b+' branch':'')+(dt?' · '+longDate(dt):''); }
+
+function resetUI(){ var box=$('resetBox'); box.innerHTML='<button type="button" class="btn danger" id="resetAsk">Clear form and start a new drill</button>';
+  $('resetAsk').onclick=function(){ box.innerHTML='<span>Clear everything, including photos? Create the PDF first if you need it.</span><button type="button" class="btn small danger" id="resetYes">Clear everything</button><button type="button" class="btn small" id="resetNo">Cancel</button>';
+    $('resetNo').onclick=resetUI; $('resetYes').onclick=function(){ idbDel(STORE).then(function(){ location.reload(); }); }; }; }
+
+/* ---------- PDF ---------- */
+var BRAND=[31,111,201], BRAND_SOFT=[232,241,252], INKC=[24,33,43], MUTEDC=[90,102,115];
+var FILL={g:[227,243,232],a:[255,236,196],r:[253,220,216]}, TXT={g:[30,110,64],a:[140,90,0],r:[170,30,25]};
+var ANSCOL={'Yes':'g','Done':'g','Partly':'a','No':'r','Not yet':'r'};
+function clean(s){ return String(s==null?'':s).replace(/[‘’ʼ]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,'-').replace(/…/g,'...').replace(/×/g,'x').replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g,''); }
+function longDate(v){ if(!v) return ''; var p=v.split('-'); if(p.length!==3) return v; return new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}); }
+function shortDate(v){ if(!v) return ''; var p=v.split('-'); return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:v; }
+function ansCell(h){ if(h.section==='body'&&h.column.index===1){ var c=ANSCOL[h.cell.raw]; if(c==='r'||c==='a'){ h.cell.styles.fillColor=FILL[c]; } if(c) h.cell.styles.textColor=TXT[c]; } }
+
+function buildPDF(d){
+  var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'}); var W=210,H=297,M=14,y;
+  doc.setLineHeightFactor(1.25);
+  doc.setFillColor.apply(doc,BRAND); doc.rect(0,0,W,30,'F');
+  try{ doc.addImage($('logoImg').src,'PNG',W-M-46,7,46,46*70/476); }catch(e){}
+  doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(17); doc.text('Fire Drill Record',M,13);
+  doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+  doc.text(clean('Safar Academy  |  '+(d.branch||'')+' branch  |  '+(d.venue||'').split('\n')[0]),M,21);
+  doc.setFontSize(9); doc.text(clean('Drill on '+longDate(d.date)+(d.tAlarm?' at '+d.tAlarm.slice(0,5):'')+', run by '+(d.warden||'')),M,26.5);
+  doc.setTextColor.apply(doc,INKC); y=38;
+
+  function heading(txt,sub){ if(y>H-40){ doc.addPage(); y=18; } doc.setFont('helvetica','bold'); doc.setFontSize(12.5); doc.setTextColor.apply(doc,BRAND); doc.text(clean(txt),M,y);
+    doc.setDrawColor.apply(doc,BRAND); doc.setLineWidth(.4); doc.line(M,y+1.8,W-M,y+1.8); doc.setTextColor.apply(doc,INKC); doc.setFont('helvetica','normal'); y+=6;
+    if(sub){ doc.setFontSize(8.5); doc.setTextColor.apply(doc,MUTEDC); var l=doc.splitTextToSize(clean(sub),W-2*M); doc.text(l,M,y); y+=l.length*3.8+1.5; doc.setTextColor.apply(doc,INKC); } }
+  var base={theme:'grid',margin:{left:M,right:M,top:16,bottom:16},styles:{font:'helvetica',fontSize:9,cellPadding:2,lineColor:[210,218,226],lineWidth:.2,textColor:INKC,valign:'top',overflow:'linebreak'},headStyles:{fillColor:BRAND,textColor:255,fontStyle:'bold'}};
+  function table(o){ var opt=Object.assign({},base,o,{startY:y}); opt.styles=Object.assign({},base.styles,o.styles||{}); doc.autoTable(opt); y=doc.lastAutoTable.finalY+7; }
+  var keyCol={0:{fontStyle:'bold',cellWidth:58,fillColor:BRAND_SOFT}};
+  function rows(list){ return list.map(function(r){ return [r[0],clean(r[1]||'-')]; }); }
+
+  // summary
+  var allObs=[]; OBS.forEach(function(g,gi){ g.q.forEach(function(q,i){ allObs.push((obs['o'+gi+'_'+i]||{}).v||''); }); });
+  function n(v){ return allObs.filter(function(x){ return x===v; }).length; }
+  var c=countSummary(), la=liveActs(), concerns=n('No')+n('Partly');
+  heading('Summary');
+  table({body:rows([
+    ['Time to get everyone out',dur(gap('tAlarm','tOut'))||'Not recorded'],
+    ['Time until everyone accounted for',dur(gap('tAlarm','tReg'))||'Not recorded'],
+    ['Alarm to all clear',dur(gap('tAlarm','tClear'))||'Not recorded'],
+    ['Headcount at first count',c.any?(c.miss?c.miss+' not accounted for. ':'Everyone accounted for. ')+c.txt:'Not recorded'],
+    ['Observations','Yes: '+n('Yes')+'    Partly: '+n('Partly')+'    No: '+n('No')+(n('')?'    Not answered: '+n(''):'')],
+    ['Actions to complete',String(la.length)],
+    ['Overall result',d.outcome]
+  ]),columnStyles:keyCol,didParseCell:function(h){ if(h.section!=='body'||h.column.index!==1) return;
+    if((h.row.index===3&&c.miss)||(h.row.index===6&&/Not satisfactory/.test(d.outcome||''))){ h.cell.styles.textColor=TXT.r; h.cell.styles.fontStyle='bold'; }
+    if(h.row.index===4&&concerns){ h.cell.styles.textColor=TXT.a; h.cell.styles.fontStyle='bold'; } }});
+
+  // details
+  heading('Drill details');
+  table({body:rows([
+    ['Branch',d.branch],['Venue',d.venue],['Venue type',d.venueType],['Date',longDate(d.date)],['Type of drill',d.drillType],['When in the session',d.period],
+    ['How the alarm was raised',d.alarmMethod],['Scenario used',d.scenario],['Assembly point(s) used',d.ap],['Fire warden',d.warden],['Fire marshals on duty',d.marshals],
+    ['Venue contact told',d.venueContact],['Other groups in the building',d.otherHirers]
+  ]),columnStyles:keyCol});
+
+  // timings and headcount
+  if(y>H-95){ doc.addPage(); y=18; }
+  heading('Timings and headcount');
+  table({head:[['Stage','Time','Time since alarm']],body:STAGES.map(function(s,i){ return [s[1].replace(': start the clock',''),d[s[0]]||'-',i?(dur(gap('tAlarm',s[0]))||'-'):'']; }),
+    columnStyles:{0:{fontStyle:'bold',cellWidth:80},1:{cellWidth:40}}});
+  var hc=[['Pupils','pupilsOn','pupilsAcc'],['Staff and volunteers','staffOn','staffAcc'],['Visitors and parents','visOn','visAcc']].map(function(g){ var on=d[g[1]],acc=d[g[2]],m=(on!==''&&acc!=='')?(+on)-(+acc):null; return [g[0],on||'-',acc||'-',m==null?'-':m>0?String(m):'0']; });
+  table({head:[['Group','On site','Accounted for at first count','Missing']],body:hc,columnStyles:{0:{fontStyle:'bold',cellWidth:60}},
+    didParseCell:function(h){ if(h.section==='body'&&h.column.index===3&&+h.cell.raw>0){ h.cell.styles.fillColor=FILL.r; h.cell.styles.textColor=TXT.r; h.cell.styles.fontStyle='bold'; } }});
+  if((d.missing||'').trim()) table({body:rows([['Not accounted for, and why',d.missing]]),columnStyles:keyCol});
+
+  // before
+  heading('Before the drill');
+  table({head:[['Check','Answer','Note']],body:PREP.map(function(q,i){ var a=prep['p'+i]||{}; return [clean(q),a.v||'-',clean(a.n||'')]; }),
+    columnStyles:{0:{cellWidth:100},1:{cellWidth:20,halign:'center',fontStyle:'bold'}},didParseCell:ansCell});
+
+  // observations
+  heading('What the fire warden saw','Anything marked No or Partly should have an action in the action plan.');
+  OBS.forEach(function(g,gi){
+    if(y>H-40){ doc.addPage(); y=18; }
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.text(clean(g.t),M,y); doc.setFont('helvetica','normal'); y+=2.5;
+    table({head:[['Check','Answer','Note']],body:g.q.map(function(q,i){ var a=obs['o'+gi+'_'+i]||{}; return [clean(q),a.v||'-',clean(a.n||'')]; }),
+      columnStyles:{0:{cellWidth:100},1:{cellWidth:20,halign:'center',fontStyle:'bold'}},didParseCell:ansCell});
+  });
+  table({body:rows([['Inappropriate behaviour',d.behaviour],['Difficulties people had',d.difficulties],['Route or assembly point problems',d.routes]]),columnStyles:keyCol});
+
+  // actions
+  if(y>H-70){ doc.addPage(); y=18; }
+  heading('Action plan');
+  if(la.length) table({head:[['#','Problem found','Action','Owner','By when']],body:la.map(function(a,i){ return [String(i+1),clean(a.issue||'-'),clean(a.action||'-'),clean(a.owner||'-'),shortDate(a.due)||'-']; }),
+    styles:{fontSize:8.5},columnStyles:{0:{cellWidth:9,halign:'center'},1:{cellWidth:52},3:{cellWidth:30},4:{cellWidth:22}}});
+  else table({body:[['No actions recorded']]});
+  table({body:rows([['Findings added to the fire risk assessment',d.fra],['Joint drill with other groups',d.jointDrill],['Overall result',d.outcome]]),columnStyles:keyCol,
+    didParseCell:function(h){ if(h.section==='body'&&h.column.index===1&&/Not yet|Still to arrange|Not satisfactory/.test(h.cell.raw||'')){ h.cell.styles.textColor=TXT.r; h.cell.styles.fontStyle='bold'; } }});
+
+  // sign-off
+  if(y>H-90){ doc.addPage(); y=18; }
+  heading('Sign-off');
+  table({head:[['Role','Name','Date']],body:[['Fire warden',clean(d.warden||''),shortDate(d.date)],['Reviewed by (Academy Head)',clean(d.approver||''),shortDate(d.approveDate)],['Shared with venue contact',clean(d.sharedWith||''),'']],
+    columnStyles:{0:{fontStyle:'bold',cellWidth:58,fillColor:BRAND_SOFT},2:{cellWidth:30}}});
+  table({body:rows([['Staff debriefed',d.briefed],['Next drill due',shortDate(d.nextDrill)]]),columnStyles:keyCol});
+  if(sigData){ if(y>H-40){ doc.addPage(); y=18; } try{ var pr=doc.getImageProperties(sigData), sh=24, sw=Math.min(80,sh*pr.width/pr.height); doc.addImage(sigData,'PNG',M,y,sw,sh); }catch(e){} y+=26; }
+  doc.setDrawColor(150); doc.setLineWidth(.2); doc.line(M,y,M+80,y); doc.setFontSize(8); doc.setTextColor.apply(doc,MUTEDC); doc.text('Signature, fire warden',M,y+4); y+=12;
+  doc.setFontSize(7.5);
+  doc.text(doc.splitTextToSize('Recorded under section 5 of the Safar Academy Fire Safety Policy, which asks for a drill at least once a year at every branch and a log of each one. Keep this record with the branch fire risk assessment, and add any significant findings to it.',W-2*M),M,y);
+  doc.setTextColor.apply(doc,INKC);
+
+  // photos
+  var ph=photos.filter(function(p){ return p&&p.data; });
+  if(ph.length){ doc.addPage(); y=18; heading('Photos'); var bw=W-2*M,bh=110;
+    ph.forEach(function(p,i){ doc.setFontSize(9); var cap=doc.splitTextToSize(clean('Photo '+(i+1)+(p.caption?': '+p.caption:'')),bw); var k=Math.min(bw/p.w,bh/p.h),iw=p.w*k,ih=p.h*k;
+      if(y+ih+6+cap.length*4.5>H-16){ doc.addPage(); y=18; } doc.addImage(p.data,'JPEG',M+(bw-iw)/2,y,iw,ih); y+=ih+5; doc.text(cap,M,y); y+=cap.length*4.5+8; }); }
+
+  var np=doc.getNumberOfPages(), stamp='Created '+new Date().toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  for(var p=1;p<=np;p++){ doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(120,130,140);
+    doc.text(clean('Safar Academy - '+(d.branch||'')+' - Fire Drill Record - '+shortDate(d.date)),M,H-8); doc.text(stamp+'  |  Page '+p+' of '+np,W-M,H-8,{align:'right'}); }
+  return doc;
+}
+
+function validate(d){
+  var need=[['branch','branch'],['venue','venue'],['date','date'],['warden','fire warden\'s name']], bad=[], first=null;
+  need.forEach(function(k){ if(!String(d[k[0]]||'').trim()){ bad.push(k[1]); F(k[0]).classList.add('invalid'); if(!first) first=F(k[0]); } });
+  if(bad.length){ first.scrollIntoView({behavior:'smooth',block:'center'}); setStatus('Fill in the '+bad.join(', ')+' in step 1 first.',true); return false; }
+  return true;
+}
+var pdfBlob=null, pdfName='';
+$('pdfBtn').addEventListener('click',function(){
+  if(!window.jspdf||!window.jspdf.jsPDF){ setStatus('The PDF tool has not loaded. Check your internet connection and reload. Your answers are saved.',true); return; }
+  var d=collect(); if(!validate(d)) return; save();
+  var btn=this; btn.disabled=true; btn.textContent='Creating…';
+  setTimeout(function(){
+    try{
+      pdfBlob=buildPDF(d).output('blob');
+      var slug=function(s){ return clean(s).trim().replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,''); };
+      pdfName=['Safar',slug(d.branch||'Branch'),'Fire-Drill',d.date].filter(Boolean).join('_')+'.pdf';
+      $('sheetName').textContent=pdfName;
+      var canShare=false; try{ canShare=!!(navigator.canShare&&navigator.canShare({files:[new File([pdfBlob],pdfName,{type:'application/pdf'})]})); }catch(e){}
+      $('shareBtn').style.display=canShare?'':'none'; $('dlBtn').classList.toggle('primary',!canShare);
+      $('sheet').classList.add('open'); setStatus('PDF created');
+    }catch(err){ console.error(err); setStatus('The PDF could not be created: '+err.message,true); }
+    finally{ btn.disabled=false; btn.textContent='Create PDF'; }
+  },30);
+});
+$('shareBtn').addEventListener('click',function(){ if(!pdfBlob) return; navigator.share({files:[new File([pdfBlob],pdfName,{type:'application/pdf'})],title:'Fire drill record',text:'Please send to management@safaracademy.org'}).catch(function(){}); });
+$('dlBtn').addEventListener('click',function(){ if(!pdfBlob) return; var url=URL.createObjectURL(pdfBlob),a=document.createElement('a'); a.href=url; a.download=pdfName; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); },60000); });
+$('closeSheet').addEventListener('click',function(){ $('sheet').classList.remove('open'); });
+$('sheet').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
+
+/* ---------- init ---------- */
+function today(){ var n=new Date(); return new Date(n.getTime()-n.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+function addInfo(){ Object.keys(INFO).forEach(function(k){
+    var host=(k==='sig')?$('sigLabel'):(form.elements[k]&&form.elements[k].closest&&form.elements[k].closest('label.f'));
+    if(!host||host.querySelector('.i')) return;
+    var id='info-'+k, ic=document.createElement('span');
+    ic.className='i'; ic.textContent='i'; ic.setAttribute('role','button'); ic.tabIndex=0; ic.setAttribute('aria-label','What does this mean?'); ic.setAttribute('aria-expanded','false'); ic.setAttribute('aria-controls',id);
+    var field=host.querySelector('input,select,textarea'), req=host.querySelector('.req');
+    if(req) req.after(ic); else if(field) host.insertBefore(ic,field); else host.appendChild(ic);
+    var box=document.createElement('div'); box.className='infoBox'; box.id=id; box.hidden=true; box.innerHTML=INFO[k];
+    if(field) host.insertBefore(box,field); else host.after(box);
+    function toggle(e){ e.preventDefault(); e.stopPropagation(); box.hidden=!box.hidden; ic.setAttribute('aria-expanded',String(!box.hidden)); }
+    ic.addEventListener('click',toggle); ic.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' ') toggle(e); });
+    box.addEventListener('click',function(e){ e.preventDefault(); });
+  }); }
+function boot(){ addInfo(); if(!F('date').value) F('date').value=today(); renderPrep(); renderObs(); renderActs(); renderPhotos(); renderTimer(); renderCount(); resetUI(); updateHeader(); requestAnimationFrame(function(){ growAll(); sizeCanvas(); }); }
+boot();
+idbGet(STORE).then(function(s){ if(!s) return;
+  applyFields(s.f); prep=s.prep||{}; obs=s.obs||{}; acts=Array.isArray(s.acts)?s.acts:[]; photos=s.photos||[]; sigData=s.sig||null; tStart=s.tStart||null;
+  boot(); setStatus('Draft restored from this device'); });
+var lastW=window.innerWidth; window.addEventListener('resize',function(){ if(window.innerWidth!==lastW){ lastW=window.innerWidth; sizeCanvas(); growAll(); } });
+})();
+</script>
+</body>
+</html>
